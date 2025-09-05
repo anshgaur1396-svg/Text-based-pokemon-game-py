@@ -1,8 +1,8 @@
+import random
+
 User_name = input("Enter your name: ")
 User_age = int(input("Enter your age: "))
 print("\nRead the instruction:-\n1) Look up the name of the pokemon from Poke_list.\n2) Look up their move set and power from under the available pokemon section.\n")
-
-import random
 
 class Pokemon:
     def __init__(self, name, P_type, level, HP, attack, defence, moves):
@@ -39,24 +39,35 @@ class Pokemon:
 
 def battle(pokemon1, pokemon2):
     while not pokemon1.fainted() and not pokemon2.fainted():
+        print("\nAvailable moves:")
+        for move in pokemon2.moves:
+            print(f" - {move['name']} (Power: {move['Power']})")
+
         user_move = input("Choose your move: ").strip()
 
-        print(f"\n{pokemon2.name} uses {user_move}!")
-        damage = pokemon2.attack + pokemon2.get_move_power(user_move)
-        pokemon1.damage_done(damage)
-        print(f"Wild {pokemon1.name} has HP:{pokemon1.HP} left!\n")
+        # Check if move is valid
+        valid_moves = [m["name"].lower() for m in pokemon2.moves]
+        if user_move.lower() not in valid_moves:
+            print(f"Invalid move! {pokemon2.name} got confused and lost its turn...\n")
+        else:
+            print(f"\n{pokemon2.name} uses {user_move}!")
+            damage = pokemon2.attack + pokemon2.get_move_power(user_move)
+            pokemon1.damage_done(damage)
+            print(f"Wild {pokemon1.name} has HP:{pokemon1.HP} left!\n")
 
-        if (pokemon1.fainted()) and not (pokemon2.fainted()):
-            print(f"Wild {pokemon1.name} has fainted!\n\n{User_name} earned 255 pokedollar!")
-            return
+            if pokemon1.fainted() and not pokemon2.fainted():
+                print(f"Wild {pokemon1.name} has fainted!")
+                print(f"\n{User_name} earned 255 pokedollar!")
+                return
 
+        # Opponent’s turn
         move = pokemon1.choose_move()
         print(f"{pokemon1.name} uses {move['name']}!\n")
         damage = pokemon1.attack + move["Power"]
         pokemon2.damage_done(damage)
         print(f"Your {pokemon2.name} has HP:{pokemon2.HP} left!\n")
 
-        if (pokemon2.fainted()):
+        if pokemon2.fainted():
             print(f"Your {pokemon2.name} has fainted!")
             return
         
@@ -106,7 +117,7 @@ Togepi = Pokemon("Togepi", "Fairy", 20, 47, 16, 34,
 print("You stepped into tall grass!\n")
 
 Poke_list = ["Pikachu", "Charmander", "Bulbasaur", "Squirtle", "Eevee", "Psyduck","Togepi"]
-Poke_dict = {"Pikachu":Pikachu, 
+Poke_dict_comp = {"Pikachu":Pikachu, 
             "Charmander":Charmander, 
             "Bulbasaur":Bulbasaur, 
             "Squirtle":Squirtle, 
@@ -114,18 +125,34 @@ Poke_dict = {"Pikachu":Pikachu,
             "Psyduck":Psyduck,
             "Togepi":Togepi}
 
-pokemon1 = Poke_dict.get(random.choice(Poke_list))
+Poke_dict_User = {"pikachu":Pikachu, 
+            "charmander":Charmander, 
+            "bulbasaur":Bulbasaur, 
+            "squirtle":Squirtle, 
+            "eevee":Eevee,
+            "psyduck":Psyduck,
+            "togepi":Togepi}
+
+pokemon1 = Poke_dict_comp.get(random.choice(Poke_list))
 print(f"A wild {pokemon1} appeared!\nlevel: {pokemon1.level}\nHP: {pokemon1.HP}\nType: {pokemon1.P_type}\n")
 
-p2 = input("Enter the name of your pokemon: ").title()
+print(Poke_list)
+p2 = input("Choose your pokemon: ").strip().lower()
 
 while True:
-    if p2 in Poke_dict: 
-        pokemon2 = Poke_dict.get(p2)
-        print(f"\nYou chose {pokemon2}!\nlevel: {pokemon2.level}\nHP: {pokemon2.HP}\nType: {pokemon2.P_type}\n")
+    if p2 in Poke_dict_User: 
+        pokemon2 = Poke_dict_User.get(p2)
+        print(f"\nYou chose {pokemon2}!")
+        print(f"Level: {pokemon2.level}")
+        print(f"HP: {pokemon2.HP}")
+        print(f"Type: {pokemon2.P_type}")
+        print(f"Attack: {pokemon2.attack}")
+        print(f"Defence: {pokemon2.defence}")
+        print("Moves:")
+        print()
+        
         battle(pokemon1, pokemon2)
-    elif p2 not in Poke_dict:
+    elif p2 not in Poke_dict_User:
         print("Invalid name!")
     break
-
 
